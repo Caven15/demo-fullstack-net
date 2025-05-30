@@ -1,39 +1,59 @@
 <div class="container mt-4">
   <h1 class="text-primary mb-4">Contact API demo</h1>
 
-  <!-- Boucle sur la listez des posts (avec un suivi d'index) -->
-  @for (post of posts; track $index) {
-  <div class="card shadow-sm mb-3">
+  <div class="card mb-4">
     <div class="card-body">
-      <h5 class="card-title">{{post.title}} {{$index+1}}</h5>
-      <p class="card-text">{{post.body}}</p>
-      <button class="btn btn-outline-primary" (click)="Modif(post)">Modifer</button>
+      <h4 class="card-title">Créer un post</h4>
+
+      <div class="form-group mb-3">
+        <label for="new-title">Titre</label>
+        <input id="new-title" type="text" class="form-control" [(ngModel)]="nouveauPost.title">
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="contenu">Contenu</label>
+        <textarea id="contenu" type="text" class="form-control" rows="5" [(ngModel)]="nouveauPost.body"></textarea>
+      </div>
+
+      <button class="btn btn-success" (click)="creerPost()">Créer</button>
     </div>
   </div>
-  }
+  <div class="card shadow-sm mb-3">
 
-  @if (etatModif) {
-  <div class="mt-4">
-    <h4 class="text-secondary">Modifier un post</h4>
-
-    <div class="form-group mb-3">
-      <label for="titre">Titre</label>
-      <input id="titre" type="text" class="form-control" [(ngModel)]="postModifie.title">
+    <!-- Boucle sur la listez des posts (avec un suivi d'index) -->
+    @for (post of posts; track $index) {
+    <div class="card shadow-sm mb-3">
+      <div class="card-body">
+        <h5 class="card-title">{{post.title}} {{$index+1}}</h5>
+        <p class="card-text">{{post.body}}</p>
+        <button class="btn btn-outline-primary" (click)="Modif(post)">Modifer</button>
+        <button class="btn btn-danger" (click)="supprimerPost($index+1)">❌</button>
+      </div>
     </div>
+    }
 
-    <div class="form-group mb-3">
-      <label for="contenu">Contenu</label>
-      <textarea id="contenu" type="text" class="form-control" rows="5" [(ngModel)]="postModifie.body"></textarea>
+    @if (etatModif) {
+    <div class="mt-4">
+      <h4 class="text-secondary">Modifier un post</h4>
+
+      <div class="form-group mb-3">
+        <label for="titre">Titre</label>
+        <input id="titre" type="text" class="form-control" [(ngModel)]="postModifie.title">
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="contenu">Contenu</label>
+        <textarea id="contenu" type="text" class="form-control" rows="5" [(ngModel)]="postModifie.body"></textarea>
+      </div>
+
+      <button class="btn btn-primary" (click)="ModifPost()">Enregistrer</button>
+      <button class="btn btn-secondary" (click)="etatModif = false">Annuler</button>
     </div>
+    }
 
-    <button class="btn btn-primary" (click)="ModifPost()">Enregistrer</button>
-    <button class="btn btn-secondary" (click)="etatModif = false">Annuler</button>
-  </div>
-  }
-
-  @if (messageErreur) {
+    @if (messageErreur) {
     <div class="alert alert-danger mt-3">
       {{messageErreur}}
     </div>
-  }
-</div>
+    }
+  </div>

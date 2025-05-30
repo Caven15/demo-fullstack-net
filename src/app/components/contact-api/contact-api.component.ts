@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ContactApiService } from '../../tools/service/contact-api.service';
 import { Post } from '../../models/post.model';
+import { error } from 'console';
 
 @Component({
   selector: 'app-contact-api',
@@ -10,47 +11,53 @@ import { Post } from '../../models/post.model';
 })
 export class ContactApiComponent {
 
-  constructor(private _contactApi : ContactApiService) {}
+  constructor(private _contactApi: ContactApiService) { }
 
-  messageErreur : string = "";
+  messageErreur: string = "";
 
-  posts : Post[] = [];
+  posts: Post[] = [];
 
-  etatModif : boolean = false;
+  etatModif: boolean = false;
 
-  postModifie! : Post;
+  postModifie!: Post;
+
+  nouveauPost: Post = {
+    title: '',
+    body: '',
+    userId: 1
+  }
 
   ngOnInit(): void {
     this._contactApi.RecupererPosts().subscribe({
-      next : (data) => {
-        this.posts = data.slice(0,10);
+      next: (data) => {
+        this.posts = data.slice(0, 10);
       },
       error: (error) => {
         // En cas d'erreur http, on stocke un message pour l'afficher...
         this.messageErreur = error.message;
       },
-      complete : () => {
+      complete: () => {
         console.log("✅ Récupération des post ok !!!!");
       }
     })
   }
 
-  ModifPost() : void{
+  ModifPost(): void {
     this._contactApi.ModifPost(this.postModifie).subscribe({
-      next : (data) => {
+      next: (data) => {
         // On retrouve le post dans la liste initale et on le remplace
         const index = this.posts.findIndex((p) => p.id === data.id);
         if (index !== -1) {
           console.log("je passe dans l'update de la liste");
           console.log(data);
           this.posts[index] = data;
-          this.etatModif =false;
+          this.etatModif = false;
         }
       },
-      error : (error) => {
+      error: (error) => {
         console.error('⛔ Erreur lors de la modification :', error.message)
       },
-      complete : () => {
+      complete: () => {
         console.log('Modif réalisé !!!');
       }
     })
@@ -60,9 +67,36 @@ export class ContactApiComponent {
    * Active l'état de modification et clone le post cliqué
    * @param post le post sélectionné pour modification
    */
-  Modif(post : Post) : void {
+  Modif(post: Post): void {
     // on clone le post pour éviter de modifier la liste
-    this.postModifie = {...post};
+    this.postModifie = { ...post };
     this.etatModif = true;
+  }
+
+  creerPost(): void {
+    this._contactApi.CreatePost(this.nouveauPost).subscribe({
+      next: (data) => {
+        this.posts.unshift(data);
+        this.nouveauPost = {
+          title: '',
+          body: '',
+          userId: 1
+        }
+      },
+      error: (error) => {
+        console.error("Erreur de création :", error.message);
+      }
+    })
+  }
+
+  supprimerPost(id: number): void {
+    this._contactApi.SupprimerPost(id).subscribe({
+      next: () => {
+        this.posts = this.posts.filter(p => p.id !== id);
+      },
+      error: (error) => {
+        console.error("Erreur de suppression :", error.message);
+      }
+    })
   }
 }
